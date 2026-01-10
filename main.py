@@ -1,9 +1,28 @@
-
 from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Border, Side, Alignment, Font, PatternFill
+from openpyxl.utils import get_column_letter
 from config import *
 from pprint import pprint
 
-# abhi ke liye assume karunga ki control file me ek hi sheet hogi not sure ki alag alag branches ke liye alag sheet karni hai ya nahi
+# --- Styling Definitions ---
+thin_side = Side(border_style="thin", color="000000")
+table_border = Border(top=thin_side, left=thin_side, right=thin_side, bottom=thin_side)
+header_font = Font(name='Calibri', size=11, bold=True)
+header_fill = PatternFill(start_color="D9D9D9", end_color="D9D9D9", fill_type="solid") # Light Grey
+body_font = Font(name='Calibri', size=11)
+center_aligned = Alignment(horizontal='center', vertical='center')
+left_aligned = Alignment(horizontal='left', vertical='center')
+
+def apply_formatting(cell, is_header=False, align='center'):
+    cell.border = table_border
+    if is_header:
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = center_aligned
+    else:
+        cell.font = body_font
+        cell.alignment = left_aligned if align == 'left' else center_aligned
+
 def get_control_dict(sheet):
     r = config.ROW_STARTING 
     control_dict = {}
@@ -13,119 +32,118 @@ def get_control_dict(sheet):
         toenter = 4 
         subject_sets = set()
         while(sheet.cell(row=r, column=toenter).value is not None):     
-            subject_sets.add(
-                sheet.cell(row=r,column=toenter).value.strip()
-            )
+            subject_sets.add(str(sheet.cell(row=r,column=toenter).value).strip())
             toenter+=1
-        data ={
+        control_dict[btid] = {
             'row' : r,
             'name' : name,
             'toenter': toenter,
             'subjects_set': subject_sets
         }
-        control_dict[btid] = data
         r+=1
+    control_dict["last_row"] = r
     return control_dict
 
-       
-
-
-def process_subject_sheet(sheet, control, newdict):
-    
+def process_subject_sheet(sheet, control, newdict, namelookup):
     def find_course_name():
         c=1
         r=config.COURSE_PAGE_HEADER_WITH_COURSE_TITLE_ROW_NO-1
-        while sheet.cell(row=r, column=c).value!='Cource Title':
+        while sheet.cell(row=r, column=c).value != 'Cource Title':
             c+=1
-        name= sheet.cell(row=r+1,column=c).value.strip()
-       
-        name = name.replace('\n', ' ')
-        return name
+        name = sheet.cell(row=r+1,column=c).value
+        return str(name).strip().replace('\n', ' ') if name else "Unknown Course"
     
     def get_cols():
-        r=config.COURSE_PAGE_HEADER_WITH_COURSE_TITLE_ROW_NO+1
-        c=1
-        reexam_col = -1
-        name_col = -1
-        btid_col = -1
-
-        while True:
-            v = sheet.cell(row=r, column=c)
-            
-            if(v.value is not None):
-                vl = v.value.strip().replace('\n', ' ')
-                if(vl=="Re-Exam Grades"):  
-                    reexam_col = c
-                    break
-                elif(vl=="Name"):
-                    name_col = c
-                elif(vl=="Roll No."):
-                    btid_col = c
-            if(c>=1000): raise Exception("No column found with the name 'Re-Exam Grades' ")
-            c+=1
-        return reexam_col, name_col, btid_col
-
-
-    def find_starting_row():
         r = config.COURSE_PAGE_HEADER_WITH_COURSE_TITLE_ROW_NO + 1
-        while sheet.cell(row=r, column=1).value != 1:
-            r+=1
-        return r
+        c = 1
+        res = {'reexam': -1, 'name': -1, 'btid': -1}
+        while True:
+            v = sheet.cell(row=r, column=c).value
+            if v:
+                vl = str(v).strip().replace('\n', ' ')
+                if vl == "Re-Exam Grades": res['reexam'] = c; break
+                elif vl == "Name": res['name'] = c
+                elif vl == "Roll No.": res['btid'] = c
+            if c >= 1000: raise Exception("Header not found")
+            c += 1
+        return res['reexam'], res['name'], res['btid']
 
-    cource_title = find_course_name()
-
-    print(cource_title)
-    starting_row = find_starting_row()
-    r = starting_row
+    course_title = find_course_name()
     reexam_grade_col, name_col, btid_col = get_cols()
-    # print(reexam_grade_col)
+    r = config.COURSE_PAGE_HEADER_WITH_COURSE_TITLE_ROW_NO + 1
+    while sheet.cell(row=r, column=1).value != 1: r += 1
+
     while True:
+        n_v, b_v, g_v = [sheet.cell(row=r, column=col).value for col in [name_col, btid_col, reexam_grade_col]]
+        if n_v is None and b_v is None: break
         
-        name_val = sheet.cell(row=r, column=name_col).value
-        btid_val = sheet.cell(row=r, column=btid_col).value
-        grade_val = sheet.cell(row=r, column=reexam_grade_col).value
-
-      
-        if name_val is None and btid_val is None:
-            break
-
-    
-        name = str(name_val).strip() if name_val else ""
-        btid = str(btid_val).strip() if btid_val else ""
-        reexam_grade_value = str(grade_val).strip() if grade_val else ""
-
-       
-        if reexam_grade_value == "FF":
+        name, btid, grade = [str(v).strip() if v else "" for v in [n_v, b_v, g_v]]
+        namelookup[btid] = name
+        if grade == "FF":
             if btid in control:
-                
-                if cource_title not in control[btid].get('subjects_set', set()):
-                    newdict.setdefault(btid, []).append(cource_title)
+                if course_title not in control[btid].get('subjects_set', set()):
+                    newdict.setdefault(btid, []).append(course_title)
             else:
-               
-                newdict.setdefault(btid, []).append(cource_title)
-
-        
-        print(f"Processed row: {r}")
+                newdict.setdefault(btid, []).append(course_title)
         r += 1
-def process_subject_file(file, control, newdict):
-    subject_wb = load_workbook(file,data_only=True)
-    
-    for sheetname in subject_wb.sheetnames:
-        sheet = subject_wb[sheetname]
-        process_subject_sheet(sheet, control, newdict)
-   
-def main():
-    control_file = "control.xlsx"
-    control_wb  = load_workbook(control_file)
-    control_sheet = control_wb.active
-    control_dict  = get_control_dict(control_sheet)
-    # print(control_dict)
-    newdict = dict()
 
-    subject_file = "csh2.xlsx"
-    process_subject_file(subject_file, control_dict, newdict)
-    process_subject_file("csh4.xlsx", control_dict, newdict)
-    pprint(newdict)
+def process_subject_file(file, control, newdict, namelookup):
+    subject_wb = load_workbook(file, data_only=True)
+    for sn in subject_wb.sheetnames:
+        process_subject_sheet(subject_wb[sn], control, newdict, namelookup)
+   
+def save_to_control_file(sheet, control, newdict, namelookup):
+    row_h = 25 
+    
+  
+   
+    for btid in newdict:
+        if btid in control:
+            r = control[btid]['row']
+            toenter = control[btid]['toenter']
+            for sub in newdict[btid]:
+                sheet.cell(row=r, column=toenter).value = sub
+                toenter += 1
+        else:
+            r = control['last_row']
+            sheet.cell(row=r, column=1).value = r - config.ROW_STARTING + 1
+            sheet.cell(row=r, column=2).value = btid
+            sheet.cell(row=r, column=3).value = namelookup.get(btid, "Name Unknown")
+            toenter = 4
+            for sub in newdict[btid]:
+                sheet.cell(row=r, column=toenter).value = sub
+                toenter += 1
+            control['last_row'] += 1
+
+  
+    for row in range(config.ROW_STARTING, sheet.max_row + 1):
+        sheet.row_dimensions[row].height = row_h
+        for col in range(1, sheet.max_column + 1):
+            cell = sheet.cell(row=row, column=col)
+          
+            align = 'left' if col == 3 else 'center'
+            apply_formatting(cell, align=align)
+
+
+    for col in range(1, sheet.max_column + 1):
+        max_l = 0
+        column_letter = get_column_letter(col)
+        for cell in sheet[column_letter]:
+            if cell.value: max_l = max(max_l, len(str(cell.value)))
+        sheet.column_dimensions[column_letter].width = max_l + 4
+
+    sheet.parent.save("control_updated.xlsx")
+
+def main():
+    control_wb = load_workbook("control2.xlsx")
+    control_sheet = control_wb.active
+    c_dict = get_control_dict(control_sheet)
+    n_dict, n_lookup = {}, {}
+    
+    process_subject_file("csh2.xlsx", c_dict, n_dict, n_lookup)
+    process_subject_file("csh4.xlsx", c_dict, n_dict, n_lookup)
+    
+    save_to_control_file(control_sheet, c_dict, n_dict, n_lookup)
 
 if __name__ == "__main__":
     main()
