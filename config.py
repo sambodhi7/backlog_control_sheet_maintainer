@@ -1,3 +1,3 @@
 class config:
     ROW_STARTING = 4
-    
+    COURSE_PAGE_HEADER_WITH_COURSE_TITLE_ROW_NO = 4
