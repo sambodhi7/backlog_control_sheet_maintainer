@@ -164,12 +164,24 @@ def save_to_control_file(sheet, control, newdict, namelookup):
             if cell.value: max_l = max(max_l, len(str(cell.value)))
         sheet.column_dimensions[column_letter].width = max_l + 4
 
-    sheet.parent.save("control_updated.xlsx")
+    # sheet.parent.save("control_updated.xlsx")
 
     # delete all the rows in the control file for which there are no entries in the newdict
     # and shift up the rows below it
-    # DO IT 
+    rows_to_delete = []
+    for btid, data in control.items():
+        if btid != "last_row" and (btid not in newdict or len(newdict[btid]) == 0):
+            rows_to_delete.append(data['row'])
+    rows_to_delete.sort(reverse=True)
+    for row in rows_to_delete:
+        sheet.delete_rows(row, 1)
     
+    # Renumber the serial numbers in column 1
+    for row in range(config.ROW_STARTING, sheet.max_row + 1):
+        sheet.cell(row=row, column=1).value = row - config.ROW_STARTING + 1
+    
+    sheet.parent.save("control_updated.xlsx") 
+
 
 def main():
     control_wb = load_workbook("control.xlsx")
