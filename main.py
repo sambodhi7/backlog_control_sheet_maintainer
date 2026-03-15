@@ -46,6 +46,7 @@ def get_control_dict(sheet):
                 subject = codeLookup[subject]
             subject_sets.add(subject)
             toenter+=1
+        toenter=4
         control_dict[btid] = {
             'row' : r,
             'name' : name,
@@ -93,6 +94,8 @@ def process_subject_sheet(sheet, control, newdict, namelookup):
         
         name, btid, grade = [str(v).strip() if v else "" for v in [n_v, b_v, g_v]]
         namelookup[btid] = name
+        if btid in control:
+            newdict[btid]= list(control[btid].get("subjects_set"))
         if grade == "FF":
             if btid in control:
                 if course_title not in control[btid].get('subjects_set', set()):
