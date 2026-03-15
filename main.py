@@ -120,10 +120,13 @@ def process_subject_file(file, control, newdict, namelookup):
 def save_to_control_file(sheet, control, newdict, namelookup):
     row_h = 25 
    
-  
+    print("Newdict:")
+    for btid, subs in newdict.items():
+        print(f"{btid}: {subs}")
+   
    
     for btid in newdict:
-        print(btid, newdict[btid])
+        
         if btid in control:
             r = control[btid]['row']
             toenter = control[btid]['toenter']
@@ -133,6 +136,7 @@ def save_to_control_file(sheet, control, newdict, namelookup):
             for sub in newdict[btid]:
                 if sub in shortFormData:
                     sub = shortFormData[sub][0]
+                
                 sheet.cell(row=r, column=toenter).value = sub
                 toenter += 1
         else:
@@ -143,7 +147,10 @@ def save_to_control_file(sheet, control, newdict, namelookup):
             toenter = 4
             
             for sub in newdict[btid]:
+                if sub in shortFormData:
+                    sub = shortFormData[sub][0]
                 sheet.cell(row=r, column=toenter).value = sub
+               
                 toenter += 1
             control['last_row'] += 1
 
