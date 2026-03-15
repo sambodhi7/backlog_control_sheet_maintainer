@@ -3,8 +3,8 @@ from openpyxl.styles import Border, Side, Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 from config import *
 from pprint import pprint
+from shortFormData import shortFormData
 
-# --- Styling Definitions ---
 thin_side = Side(border_style="thin", color="000000")
 table_border = Border(top=thin_side, left=thin_side, right=thin_side, bottom=thin_side)
 header_font = Font(name='Calibri', size=11, bold=True)
@@ -12,6 +12,15 @@ header_fill = PatternFill(start_color="D9D9D9", end_color="D9D9D9", fill_type="s
 body_font = Font(name='Calibri', size=11)
 center_aligned = Alignment(horizontal='center', vertical='center')
 left_aligned = Alignment(horizontal='left', vertical='center')
+
+def transformShortFormData():
+    lookup = dict()
+    for key, values in shortFormData.items():
+        for v in values :
+            lookup[v] = key 
+    return lookup
+
+codeLookup = transformShortFormData()
 
 def apply_formatting(cell, is_header=False, align='center'):
     cell.border = table_border
@@ -31,8 +40,11 @@ def get_control_dict(sheet):
         btid = sheet.cell(row=r, column=2).value
         toenter = 4 
         subject_sets = set()
-        while(sheet.cell(row=r, column=toenter).value is not None):     
-            subject_sets.add(str(sheet.cell(row=r,column=toenter).value).strip())
+        while(sheet.cell(row=r, column=toenter).value is not None):    
+            subject =  (sheet.cell(row=r,column=toenter).value).strip()
+            if subject in codeLookup:
+                subject = codeLookup[subject]
+            subject_sets.add(subject)
             toenter+=1
         control_dict[btid] = {
             'row' : r,
@@ -69,6 +81,8 @@ def process_subject_sheet(sheet, control, newdict, namelookup):
         return res['reexam'], res['name'], res['btid']
 
     course_title = find_course_name()
+    if course_title in codeLookup:
+        course_title = codeLookup[course_title]
     reexam_grade_col, name_col, btid_col = get_cols()
     r = config.COURSE_PAGE_HEADER_WITH_COURSE_TITLE_ROW_NO + 1
     while sheet.cell(row=r, column=1).value != 1: r += 1
@@ -102,6 +116,8 @@ def save_to_control_file(sheet, control, newdict, namelookup):
             r = control[btid]['row']
             toenter = control[btid]['toenter']
             for sub in newdict[btid]:
+                if sub in shortFormData:
+                    sub = shortFormData[sub][0]
                 sheet.cell(row=r, column=toenter).value = sub
                 toenter += 1
         else:
@@ -135,7 +151,7 @@ def save_to_control_file(sheet, control, newdict, namelookup):
     sheet.parent.save("control_updated.xlsx")
 
 def main():
-    control_wb = load_workbook("control2.xlsx")
+    control_wb = load_workbook("control.xlsx")
     control_sheet = control_wb.active
     c_dict = get_control_dict(control_sheet)
     n_dict, n_lookup = {}, {}
