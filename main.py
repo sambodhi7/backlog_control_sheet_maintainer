@@ -46,12 +46,15 @@ def get_control_dict(sheet):
                 subject = codeLookup[subject]
             subject_sets.add(subject)
             toenter+=1
+        clear_size = toenter - 4
+        
         toenter=4
         control_dict[btid] = {
             'row' : r,
             'name' : name,
             'toenter': toenter,
-            'subjects_set': subject_sets
+            'subjects_set': subject_sets,
+            'clear_size': clear_size
         }
         r+=1
     control_dict["last_row"] = r
@@ -102,6 +105,11 @@ def process_subject_sheet(sheet, control, newdict, namelookup):
                     newdict.setdefault(btid, []).append(course_title)
             else:
                 newdict.setdefault(btid, []).append(course_title)
+        else:
+            if btid in control :
+                if course_title in control[btid].get('subjects_set', set()):
+                    newdict[btid].remove(course_title)
+                    control[btid]['subjects_set'].remove(course_title)
         r += 1
 
 def process_subject_file(file, control, newdict, namelookup):
@@ -111,13 +119,17 @@ def process_subject_file(file, control, newdict, namelookup):
    
 def save_to_control_file(sheet, control, newdict, namelookup):
     row_h = 25 
-    
+   
   
    
     for btid in newdict:
+        print(btid, newdict[btid])
         if btid in control:
             r = control[btid]['row']
             toenter = control[btid]['toenter']
+            clear_size = control[btid]['clear_size']
+            for c in range(4, 4 + clear_size):
+                sheet.cell(row=r, column=c).value = None
             for sub in newdict[btid]:
                 if sub in shortFormData:
                     sub = shortFormData[sub][0]
@@ -129,6 +141,7 @@ def save_to_control_file(sheet, control, newdict, namelookup):
             sheet.cell(row=r, column=2).value = btid
             sheet.cell(row=r, column=3).value = namelookup.get(btid, "Name Unknown")
             toenter = 4
+            
             for sub in newdict[btid]:
                 sheet.cell(row=r, column=toenter).value = sub
                 toenter += 1
@@ -152,6 +165,11 @@ def save_to_control_file(sheet, control, newdict, namelookup):
         sheet.column_dimensions[column_letter].width = max_l + 4
 
     sheet.parent.save("control_updated.xlsx")
+
+    # delete all the rows in the control file for which there are no entries in the newdict
+    # and shift up the rows below it
+    # DO IT 
+    
 
 def main():
     control_wb = load_workbook("control.xlsx")
