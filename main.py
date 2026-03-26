@@ -3,7 +3,9 @@ from openpyxl.styles import Border, Side, Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 from config import *
 from pprint import pprint
-from shortFormData import shortFormData
+import json 
+
+shortFormData = json.load(open("shortFormData.json", "r", encoding="utf-8"))
 
 thin_side = Side(border_style="thin", color="000000")
 table_border = Border(top=thin_side, left=thin_side, right=thin_side, bottom=thin_side)
@@ -190,6 +192,8 @@ def save_to_control_file(sheet, control, newdict, namelookup):
         sheet.cell(row=row, column=1).value = row - config.ROW_STARTING + 1
     
     sheet.parent.save("control_updated.xlsx") 
+
+    json.dump(shortFormData, open("shortFormData.json", "w", encoding="utf-8"), indent=4)
 
 
 def main():

@@ -1,0 +1,14 @@
+{
+    "MAL104" : ["MTTDE", "Matrices, Transform Techniques, and Differential Equations", "Matrices, Transform Techniques, and Differential Equations"],
+    "ASLL103" : ["APG", "Applied Physics for Gaming"],
+    "CSLL102" : ["DS", "Data Structures"],
+    "CSLL103" : ["AP", "Application Programming"],
+    "CSLL108" : ["GDDT", "Game Development Design Thinking"],
+    "HULL102" : ["ES", "EVS", "Environmental Studies"],
+    "CSLL205" : ["DAA", "Design and Analysis of Algorithms"],
+    "CSLL207" : ["OS", "Operating Systems"],
+    "CSLL432" : ["HCI", "Human Computer Interaction"],
+    "CSLL213" : ["SEGT", "Software Engineering and Game Testing"],
+    "MALL201" : ["NMPT" , "Numerical Methods and Probability Theory"],
+    "CSPP202" : ["ITW-2" , "IT Workshop – II"]
+}
