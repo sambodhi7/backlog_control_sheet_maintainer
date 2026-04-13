@@ -1,6 +1,24 @@
+from datetime import datetime
 from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
+from openpyxl.styles import PatternFill
 from config import config
+from pprint import pprint
+import json
+shortFormData = json.load(open("shortFormData.json", "r", encoding="utf-8"))
+
+
+def transformShortFormData():
+    lookup = dict()
+    for key, values in shortFormData.items():
+        for v in values :
+            lookup[v] = key 
+    return lookup
+
+codeLookup = transformShortFormData()
+
+btid_to_name_lookup = dict()
+
 
 def get_control_dict(sheet):
     r = config.ROW_STARTING 
@@ -37,22 +55,21 @@ def util_format_string(s):
         return ""
     return s.strip().upper().replace(" ", "")
 
-def get_sub_grade_from_sterm_str(s):
-    s = s.upper().strip()
+
+def process_s_term_grade_val(s):
+    s=s.strip()
+    s= s.replace("," , " ")
     s = s.replace("S.TERM", "")
-    for txt in s.split(")"):
-        if not txt:
+    for part in s.split(")"):
+        part = part.strip()
+        if len(part)==0:
             continue
-        txt = txt.strip()
+        grade, p2 = part.split("(")
 
-        grade, rest = txt.split("(")
-        grade=grade.replace(",", "")
-        grade = grade.strip()
-        sub = rest.split(",")[0]
+        p2 = p2.replace(","," ")
+        sub=p2.split("CR")[0]
         sub=sub.strip()
-        yield sub, grade
-
-
+        yield grade.strip(), sub.strip()
 
 def process_subject_sheet2(sheet, control, newdict, codeLookup):
     row = config.HEADERR_STARTING
@@ -85,15 +102,17 @@ def process_subject_sheet2(sheet, control, newdict, codeLookup):
             if value is None:
                 break 
             btid = sheet.cell(row=r, column=2).value
+            name = sheet.cell(row=r, column=3).value
             if btid is not None:
                 res[r] = util_format_string(btid)
+                btid_to_name_lookup[btid] = name
     
             r+=1
         return rs, res
     
     row_s, row_to_btid_dict = get_row_to_btid_dict()
     
-     
+    col_to_course_code = dict() 
     while(1):
         course_code_cell = sheet.cell(row = row ,column = c)
         if course_code_cell.value is None:
@@ -101,26 +120,90 @@ def process_subject_sheet2(sheet, control, newdict, codeLookup):
         
         grade_cell = sheet.cell(row = row_s ,column = c).value
         ct = 0
-        while(ct<config.MAX_NUMBER_OF_STUDENTS): 
-            grade_cell = sheet.cell(row = row_s + ct ,column = c).value
-            if row_to_btid_dict.get(row_s + ct) is None:
-                break
-            if grade_cell is None:
-                ct+=1
-                continue
-            grade = util_format_string(grade_cell.value)
-            btid = row_to_btid_dict[row_s + ct]
+        course_code = util_format_string(course_code_cell.value)
+        # while(ct<config.MAX_NUMBER_OF_STUDENTS): 
+        #     grade_cell = sheet.cell(row = row_s + ct ,column = c).value
+        #     if row_to_btid_dict.get(row_s + ct) is None:
+        #         break
+        #     if grade_cell is None:
+        #         ct+=1
+        #         continue
+        #     grade = util_format_string(grade_cell.value)
+        #     btid = row_to_btid_dict[row_s + ct]
             
-            course_title = sheet.cell(row=row+1 ,column = c).value
-            course_code = util_format_string(course_code_cell.value)
+        #     course_title = sheet.cell(row=row+1 ,column = c).value
+        #     course_code = util_format_string(course_code_cell.value)
             
-            if course_code not in codeLookup:
-                codeLookup[course_code] = course_title
+        #     if course_code not in codeLookup:
+        #         codeLookup[course_code] = course_title
                         
-            ct+=1
-            
+        #     ct+=1
+        col_to_course_code[c] = course_code
+
         c+=1
+    
+    def process_course_and_grade(btid, course_code, grade):
+                if btid in control and course_code in control[btid]['subjects_set']:
+                    if "FF" not in grade: 
+                        newdict[btid]['removed'].append(course_code)
+                        control[btid]['list'].remove(course_code)
+
+                if "FF" in grade:
+                    if btid in newdict:
+                        newdict[btid]['added'].append(course_code)
+                        newdict[btid]['list'].append(course_code)
+                    else:
+                        newdict[btid] = {
+                            "list" : [course_code],
+                            "added" : [course_code],
+                            "removed" : []
+                        }
+            
+
+    for r, btid in row_to_btid_dict.items():
+        maxc = 0 
+        for c, course_code in col_to_course_code.items():
+            maxc = max(maxc, c)
+            grade_cell = sheet.cell(row = r ,column = c).value
+            if grade_cell is None:
+                continue
+            grade = util_format_string(grade_cell)
+            if grade == "":
+                continue
+            course_code_cell = sheet.cell(row=row ,column = c)
+            course_code = util_format_string(course_code_cell.value)
+            # if course_code not in codeLookup:
+            #     course_title = sheet.cell(row=row+2 ,column = c).value
+            #     codeLookup[course_code] = course_title
+            process_course_and_grade(btid, course_code, grade)
         
+        #find the next column with a ( in the valuue means we will calculate backlog thing too for summer terms uk
+        next_c = maxc + 1
+        while True:
+            cell = sheet.cell(row = r ,column = next_c)
+            if cell.value is None:
+                break
+            val = f"{cell.value}"
+            val = util_format_string(val)
+            if "(" in val and ")" in val:
+                for grade, course_code in process_s_term_grade_val(val):
+                    process_course_and_grade(btid, course_code, grade)
+            next_c+=1
+    
+    
+            
+
+def make_new_dict_from_control(control):
+    newdict = {}
+
+    for btid in control:
+        newdict[btid] = {
+            "list" : list(control[btid].get("subjects_set", set())),
+            "added" : [],
+            "removed" : []
+        } 
+        btid_to_name_lookup[btid] = control[btid]['name']
+    return newdict
 
 def process_subject_file2(file, control, newdict, codeLookup):
     subject_wb = load_workbook(file, data_only=True)
@@ -130,8 +213,82 @@ def process_subject_file2(file, control, newdict, codeLookup):
         if "SEM" in sn:
             process_subject_sheet2(subject_wb[sn], control, newdict, codeLookup)
 
+
+# make the save to file function it will just give a file name and you will genrate the file it should have the slno, bitid, name, and the the subjects and in in another sheet for every btid show the subjects added and deleted, the added ones are in green and the deleted ones in red 
+def save_to_control_file2(output_path, control, newdict, namelookup, last_row):
+    control_wb = Workbook()
+    sheet = control_wb.active
+    sheet.title = 'Control'
+    pprint(codeLookup)
+    # Populate the control sheet
+    sheet['A1'] = 'Sl.No'
+    sheet['B1'] = 'BTID'
+    sheet['C1'] = 'Name'
+    
+    row_num = 2
+    slno = 1
+    for btid in newdict.keys():
+        if newdict[btid]['list'] == []:
+            continue
+        sheet.cell(row=row_num, column=1).value = slno
+        sheet.cell(row=row_num, column=2).value = btid
+        sheet.cell(row=row_num, column=3).value = btid_to_name_lookup.get(btid, "")
+        
+        subjects = newdict[btid]['list']
+        col = 4
+        for subj in subjects:
+            if subj in shortFormData:
+                subj = shortFormData[subj][0]
+            sheet.cell(row=row_num, column=col).value = subj
+            
+            col += 1
+        
+        row_num += 1
+        slno += 1
+    
+    timestamp = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
+    changes_sheet = control_wb.create_sheet(f"changes {timestamp}")
+    changes_sheet['A1'] = 'BTID'
+
+    max_added = max((len(newdict[btid]['added']) for btid in newdict), default=0)
+    max_removed = max((len(newdict[btid]['removed']) for btid in newdict), default=0)
+
+    for i in range(max_added):
+        changes_sheet.cell(row=1, column=2 + i).value = f'Added {i+1}'
+    for i in range(max_removed):
+        changes_sheet.cell(row=1, column=2 + max_added + i).value = f'Removed {i+1}'
+
+    green_fill = PatternFill(start_color="00FF00", end_color="00FF00", fill_type="solid")
+    red_fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
+
+    row_num = 2
+    for btid in sorted(newdict.keys()):
+        changes_sheet.cell(row=row_num, column=1).value = btid
+
+        for i, subj in enumerate(sorted(newdict[btid]['added'])):
+            cell = changes_sheet.cell(row=row_num, column=2 + i)
+            cell.value = subj
+            cell.fill = green_fill
+
+        for i, subj in enumerate(sorted(newdict[btid]['removed'])):
+            cell = changes_sheet.cell(row=row_num, column=2 + max_added + i)
+            cell.value = subj
+            cell.fill = red_fill
+
+        row_num += 1
+    
+    control_wb.save(output_path)
+
+
 def main():
-    process_subject_file2("newdata.xlsx", {} , {}, {})
+    control_dict = get_control_dict(load_workbook("control2.xlsx").active)
+    
+    last_row = control_dict.get("last_row", 1000)
+    control_dict.pop("last_row", None)
+    newdict = make_new_dict_from_control(control_dict)
+    process_subject_file2("newdata.xlsx", control_dict, newdict, codeLookup)
+    # make a new file to save
+    save_to_control_file2("updated_control2.xlsx", control_dict, newdict, {}, last_row)
 
 if __name__ == "__main__":
     main()
