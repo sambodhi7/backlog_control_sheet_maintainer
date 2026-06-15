@@ -1,14 +1,368 @@
 {
-    "MAL104" : ["MTTDE", "Matrices, Transform Techniques, and Differential Equations", "Matrices, Transform Techniques, and Differential Equations"],
-    "ASLL103" : ["APG", "Applied Physics for Gaming"],
-    "CSLL102" : ["DS", "Data Structures"],
-    "CSLL103" : ["AP", "Application Programming"],
-    "CSLL108" : ["GDDT", "Game Development Design Thinking"],
-    "HULL102" : ["ES", "EVS", "Environmental Studies"],
-    "CSLL205" : ["DAA", "Design and Analysis of Algorithms"],
-    "CSLL207" : ["OS", "Operating Systems"],
-    "CSLL432" : ["HCI", "Human Computer Interaction"],
-    "CSLL213" : ["SEGT", "Software Engineering and Game Testing"],
-    "MALL201" : ["NMPT" , "Numerical Methods and Probability Theory"],
-    "CSPP202" : ["ITW-2" , "IT Workshop – II"]  
+    "MAL104": [
+        "MTTDE",
+        "Matrices, Transform Techniques, and Differential Equations",
+        "Matrices, Transform Techniques, and Differential Equations",
+        "Matrices, Transform\nTechniques, and\nDifferential Equations",
+        "MATRICES,TRANSFORMTECHNIQUES,ANDDIFFERENTIALEQUATIONS",
+        "MATRICES,TRANSFORM\nTECHNIQUES,AND\nDIFFERENTIALEQUATIONS"
+    ],
+    "ASLL103": [
+        "APG",
+        "Applied Physics for Gaming",
+        "APPLIEDPHYSICSFORGAMING"
+    ],
+    "CSLL102": [
+        "DS",
+        "Data Structures"
+    ],
+    "CSLL103": [
+        "AP",
+        "Application Programming",
+        "APPLICATIONPROGRAMMING"
+    ],
+    "CSLL108": [
+        "GDDT",
+        "Game Development Design Thinking",
+        "GAMEDEVELOPMENTDESIGNTHINKING"
+    ],
+    "HULL102": [
+        "ES",
+        "EVS",
+        "Environmental Studies",
+        "ENVIRONMENTALSTUDIES"
+    ],
+    "CSLL205": [
+        "DAA",
+        "Design and Analysis of Algorithms"
+    ],
+    "CSLL207": [
+        "OS",
+        "Operating Systems"
+    ],
+    "CSLL432": [
+        "HCI",
+        "Human Computer Interaction"
+    ],
+    "CSLL213": [
+        "SEGT",
+        "Software Engineering and Game Testing",
+        "SOFTWAREENGINEERINGANDGAMETESTING"
+    ],
+    "MALL201": [
+        "NMPT",
+        "Numerical Methods and Probability Theory"
+    ],
+    "CSPP202": [
+        "ITW-2",
+        "IT Workshop – II",
+        "ITWORKSHOP–II"
+    ],
+    "CSL205": [
+        "DAA",
+        "Design and Analysis of Algorithms",
+        "DESIGNANDANALYSISOFALGORITHMS"
+    ],
+    "CSL207": [
+        "OS",
+        "Operating Systems",
+        "OPERATINGSYSTEMS"
+    ],
+    "CSL432": [
+        "HCI",
+        "Human Computer Interaction",
+        "HUMANCOMPUTERINTERACTION"
+    ],
+    "MAL201": [
+        "NMPT",
+        "Numerical Methods and Probability Theory",
+        "NUMERICALMETHODSANDPROBABILITYTHEORY"
+    ],
+    "CSL303": [
+        "toc",
+        "TOC",
+        "Theory of Computation",
+        "THEORYOFCOMPUTATION"
+    ],
+    "MAL103": [
+        "CE",
+        "COE",
+        "Calculus for Engineers",
+        "Cal.for Eng.",
+        "CALCULUSFORENGINEERS",
+        "CAL.FORENG."
+    ],
+    "BEL102": [
+        "EEE",
+        "Elements of Electrical Engineering",
+        "ELEMENTSOFELECTRICALENGINEERING"
+    ],
+    "ASL101": [
+        "AS",
+        "Applied Sciences",
+        "APPLIEDSCIENCES"
+    ],
+    "CSL101": [
+        "CP",
+        "Computer Programming",
+        "COMPUTERPROGRAMMING"
+    ],
+    "ECL101": [
+        "EDC",
+        "Electronics Devices and Circuits",
+        "ELECTRONICSDEVICESANDCIRCUITS"
+    ],
+    "SAP101": [
+        "Health, Sport & Safety",
+        "HEALTH,SPORT&SAFETY"
+    ],
+    "HUL102": [
+        "EVS",
+        "Envirnmental Studies",
+        "ENVIRNMENTALSTUDIES"
+    ],
+    "ECL102": [
+        "DE",
+        "Digital Electronics",
+        "DIGITALELECTRONICS"
+    ],
+    "CSL102": [
+        "DS",
+        "Data Structures ",
+        "DATASTRUCTURES"
+    ],
+    "CSL103": [
+        "AP",
+        "Application\nProgramming",
+        "APPLICATION\nPROGRAMMING"
+    ],
+    "HUL101": [
+        "CS",
+        "Communication Skills",
+        "COMMUNICATIONSKILLS"
+    ],
+    "BEL101": [
+        "M&G",
+        "Mechanics and Graphics",
+        "MECHANICSANDGRAPHICS"
+    ],
+    "CSL202": [
+        "OOP",
+        "Introduction to Object Oriented Programming",
+        "INTRODUCTIONTOOBJECTORIENTEDPROGRAMMING"
+    ],
+    "CSL203": [
+        "CSO",
+        "Computer System\nOrganisation",
+        "COMPUTERSYSTEM\nORGANISATION"
+    ],
+    "CSL210": [
+        "DSA",
+        "Data Structure With Application",
+        "DATASTRUCTUREWITHAPPLICATION"
+    ],
+    "CSL211": [
+        "GFL",
+        "Gamification for Learning",
+        "GAMIFICATIONFORLEARNING"
+    ],
+    "CSP201": [
+        "ITW-1",
+        "ITW-I",
+        "IT Workshop- I",
+        "ITWORKSHOP-I"
+    ],
+    "ECL202": [
+        "MI",
+        " Microprocessors and  Interfacing",
+        "MICROPROCESSORSANDINTERFACING"
+    ],
+    "CSL206": [
+        "SE",
+        "Software Engineering",
+        "SOFTWAREENGINEERING"
+    ],
+    "CSL208": [
+        "DPPL",
+        "Design Principles of Programming Languages",
+        "DESIGNPRINCIPLESOFPROGRAMMINGLANGUAGES"
+    ],
+    "CSL204": [
+        "DMGT",
+        "Discrete Maths and Graph Theory",
+        "DISCRETEMATHSANDGRAPHTHEORY"
+    ],
+    "CSP202": [
+        "ITW-2",
+        "IT Workshop - II",
+        "ITWORKSHOP-II"
+    ],
+    "CSL301": [
+        "DBMS",
+        "Database Management\nSystems",
+        "DATABASEMANAGEMENT\nSYSTEMS"
+    ],
+    "CSL302": [
+        "CN",
+        "Computer Networks",
+        "COMPUTERNETWORKS"
+    ],
+    "ECL415": [
+        "Digital Image Processing",
+        "DIGITALIMAGEPROCESSING"
+    ],
+    "ECL442": [
+        "Robotics",
+        "ROBOTICS"
+    ],
+    "CSL426": [
+        "CC",
+        "Cloud Computing ",
+        "CLOUDCOMPUTING"
+    ],
+    "HUL301": [
+        "TC",
+        "Technical Communication",
+        "TECHNICALCOMMUNICATION"
+    ],
+    "HUL304": [
+        "PE",
+        "Professional Ethics ",
+        "PROFESSIONALETHICS"
+    ],
+    "MAL303": [
+        "OT",
+        "Optimization Techniques",
+        "OPTIMIZATIONTECHNIQUES"
+    ],
+    "MAL302": [
+        "ALA",
+        "Applied Linear Algebra",
+        "APPLIEDLINEARALGEBRA"
+    ],
+    "CSL304": [
+        "Compilers",
+        "COMPILERS"
+    ],
+    "CSL305": [
+        "Cryptography and\nNetwork Security",
+        "CRYPTOGRAPHYAND\nNETWORKSECURITY"
+    ],
+    "CSL422": [
+        "ML",
+        "Machine Learning",
+        "MACHINELEARNING"
+    ],
+    "CSL439": [
+        "BI",
+        "Business Intelligence",
+        "BUSINESSINTELLIGENCE"
+    ],
+    "CSL444": [
+        "Big Data Analytics",
+        "BIGDATAANALYTICS"
+    ],
+    "CSL454": [
+        "Reinforcement Learning",
+        "REINFORCEMENTLEARNING"
+    ],
+    "CSL313": [
+        "Computer Vision and Deep Learning",
+        "COMPUTERVISIONANDDEEPLEARNING"
+    ],
+    "HUL308": [
+        "Organizational Behaviour",
+        "ORGANIZATIONALBEHAVIOUR"
+    ],
+    "MAL301": [
+        "Mathematics in Data Science",
+        "MATHEMATICSINDATASCIENCE"
+    ],
+    "HUL305": [
+        "Engineering Economics",
+        "ENGINEERINGECONOMICS"
+    ],
+    "HUL302": [
+        "TIS",
+        "Technology Innovation and Society",
+        "TECHNOLOGYINNOVATIONANDSOCIETY"
+    ],
+    "HUL307": [
+        "Digital Wellness- Stabilize your mind to Utilize your brain",
+        "DIGITALWELLNESS-STABILIZEYOURMINDTOUTILIZEYOURBRAIN"
+    ],
+    "CSL427": [
+        "Software Architecture",
+        "SOFTWAREARCHITECTURE"
+    ],
+    "CSL467": [
+        "Industrial and Social Applications of Digital Twin",
+        "INDUSTRIALANDSOCIALAPPLICATIONSOFDIGITALTWIN"
+    ],
+    "CSL317": [
+        "Parallel and Distributed Computing",
+        "PARALLELANDDISTRIBUTEDCOMPUTING"
+    ],
+    "CSP204": [
+        "AI/ML Workshop - II",
+        "AI/MLWORKSHOP-II"
+    ],
+    "CSL456": [
+        "Natural Language Understanding and Generation ",
+        "NATURALLANGUAGEUNDERSTANDINGANDGENERATION"
+    ],
+    "CSL468": [
+        "Intelligent Systems",
+        "INTELLIGENTSYSTEMS"
+    ],
+    "CSL423": [
+        "Distributed Computing Systems",
+        "DISTRIBUTEDCOMPUTINGSYSTEMS"
+    ],
+    "CSL435": [
+        "Introduction to Parallel Computing ",
+        "INTRODUCTIONTOPARALLELCOMPUTING"
+    ],
+    "CSL451": [
+        "Computational Finance",
+        "COMPUTATIONALFINANCE"
+    ],
+    "CSL429": [
+        "Software Testing and Evaluation",
+        "SOFTWARETESTINGANDEVALUATION"
+    ],
+    "CSL446": [
+        "NNDL",
+        "Neural Networks and Deep Learning",
+        "NEURALNETWORKSANDDEEPLEARNING"
+    ],
+    "HUL303": [
+        "Policy, Governance and Development",
+        "POLICY,GOVERNANCEANDDEVELOPMENT"
+    ],
+    "ECL308": [
+        "Embedded Systems",
+        "EMBEDDEDSYSTEMS"
+    ],
+    "IML42J": [
+        "Introduction to Large Language Models (LLMs)",
+        "INTRODUCTIONTOLARGELANGUAGEMODELS(LLMS)"
+    ],
+    "IML494": [
+        "Privacy and Security in Online Social Media",
+        "PRIVACYANDSECURITYINONLINESOCIALMEDIA"
+    ],
+    "IML421": [
+        "Programming in Java",
+        "PROGRAMMINGINJAVA",
+        "Programming in Java\t"
+    ],
+    "CSD401": [
+        "Project ",
+        "PROJECT"
+    ],
+    "CSD402": [
+        "Internship",
+        "INTERNSHIP"
+    ]
 }
